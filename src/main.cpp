@@ -31,8 +31,13 @@ void gameOver_info(int _x, int _y);
 //对新建窗口的封装，第一个参数是一个VideoMode，表示窗口大小，第二个表示窗口标题.实际上最多可以使用四个参数，最后两个是可选的 -  Style 和ContextSettings。
 //标题中有宽字符的，字符串前要加L，不然会显示乱码
 sf::RenderWindow window(sf::VideoMode({ width * GRIDSIZE + INFO_WIDTH, height * GRIDSIZE + GRIDSIZE }), L"Snake by 李仕");
-Texture tBackground("../data/images/BK.png"), tSnakeHead("../data/images/SH01.png"), tSnakeBody("../data/images/SB0102.png"), tFruit("../data/images/sb0202.png");		//创建4个纹理对象
+
+// Texture tBackground("../data/images/BK.png"), tSnakeHead("../data/images/SH01.png"), tSnakeBody("../data/images/SB0102.png"), tFruit("../data/images/sb0202.png");		//创建4个纹理对象
+// Sprite spBackground(tBackground), spSnakeHead(tSnakeHead), spSnakeBody(tSnakeBody), spFruit(tFruit);		//创建4个精灵对象
+
+Texture tBackground, tSnakeHead, tSnakeBody, tFruit;		//创建4个纹理对象
 Sprite spBackground(tBackground), spSnakeHead(tSnakeHead), spSnakeBody(tSnakeBody), spFruit(tFruit);		//创建4个精灵对象
+
 int headRotation;
 Font font;
 Text text(font);
@@ -51,22 +56,22 @@ void Initial()
 	}
 	text.setFont(font);
 
-	// if (!tBackground.loadFromFile("../data/images/BK.png"))//加载纹理图片
-	// {
-	// 	std::cout << "BK.png 没有找到" << std::endl;
-	// }
-	// if (!tSnakeHead.loadFromFile("../data/images/SH01.png"))
-	// {
-	// 	std::cout << "SH01.png 没有找到" << std::endl;
-	// }
-	// if (!tSnakeBody.loadFromFile("../data/images/SB0102.png"))
-	// {
-	// 	std::cout << "SB0102.png 没有找到" << std::endl;
-	// }
-	// if (!tFruit.loadFromFile("../data/images/sb0202.png"))
-	// {
-	// 	std::cout << "sb0202.png 没有找到" << std::endl;
-	// }
+	if (!tBackground.loadFromFile("../data/images/BK.png"))//加载纹理图片
+	{
+		std::cout << "BK.png 没有找到" << std::endl;
+	}
+	if (!tSnakeHead.loadFromFile("../data/images/SH01.png"))
+	{
+		std::cout << "SH01.png 没有找到" << std::endl;
+	}
+	if (!tSnakeBody.loadFromFile("../data/images/SB0102.png"))
+	{
+		std::cout << "SB0102.png 没有找到" << std::endl;
+	}
+	if (!tFruit.loadFromFile("../data/images/sb0202.png"))
+	{
+		std::cout << "sb0202.png 没有找到" << std::endl;
+	}
 	/////////////////////////
 	if (!sbEat.loadFromFile("../data/Audios/Eat01.ogg"))//加载音频
 	{
@@ -80,10 +85,10 @@ void Initial()
 	{
 		std::cout << "BGM01.ogg 没有找到" << std::endl;
 	}
-	// spBackground.setTexture(tBackground);					//设置精灵对象的纹理
-	// spSnakeHead.setTexture(tSnakeHead);
-	// spSnakeBody.setTexture(tSnakeBody);
-	// spFruit.setTexture(tFruit);
+	spBackground.setTexture(tBackground, true);					//设置精灵对象的纹理
+	spSnakeHead.setTexture(tSnakeHead, true);
+	spSnakeBody.setTexture(tSnakeBody, true);
+	spFruit.setTexture(tFruit, true);
 	spBackground.setOrigin({ GRIDSIZE / SCALE / 2, GRIDSIZE / SCALE / 2 });
 	spSnakeHead.setOrigin({ GRIDSIZE / SCALE / 2, GRIDSIZE / SCALE / 2 });
 	spSnakeBody.setOrigin({ GRIDSIZE / SCALE / 2, GRIDSIZE / SCALE / 2 });
