@@ -317,6 +317,11 @@ void Logic()		//上一章的代码，没改
 	default:
 		break;
 	}
+
+	// 穿墙
+	if (x >= width) x = 0;	else if (x < 0)	x = width - 1;
+	if (y >= height) y = 0; else if (y < 0) y = height - 1;
+
 	//if (x > width || x < 0 || y > height || y < 0)
 	//	gameOver = true;
 	if (x == fruitX && y == fruitY)
@@ -343,9 +348,6 @@ void Logic()		//上一章的代码，没改
 			soundDie.play();//播放死亡的音效
 			gameOver = true;
 		}
-
-	if (x >= width) x = 0;	else if (x < 0)	x = width - 1;
-	if (y >= height) y = 0; else if (y < 0) y = height - 1;
 
 	stepX = 0.0;
 	stepY = 0.0;
@@ -446,6 +448,10 @@ void LogicStep() //步进细化
 	//if (x > width || x < 0 || y > height || y < 0)
 	//	gameOver = true;
 
+	// 穿墙
+	if (x >= width) x = 0;	else if (x < 0)	x = width - 1;
+	if (y >= height) y = 0; else if (y < 0) y = height - 1;
+
 	if (updateFlag == true)
 	{
 		if (x == fruitX && y == fruitY)
@@ -467,8 +473,7 @@ void LogicStep() //步进细化
 			if (tailX[i] >= width) tailX[i] = 0;	else if (tailX[i] < 0)	tailX[i] = width - 1;
 			if (tailY[i] >= height) tailY[i] = 0;  else if (tailY[i] < 0) tailY[i] = height - 1;
 		}
-		if (x >= width) x = 0;	else if (x < 0)	x = width - 1;
-		if (y >= height) y = 0; else if (y < 0) y = height - 1;
+
 		tailX[0] = x;
 		tailY[0] = y;
 		for (int i = 1; i < nTail; i++)
@@ -503,34 +508,41 @@ void DrawStep()
 	spSnakeHead.setRotation(sf::degrees(headRotation));
 	window.draw(spSnakeHead);
 
-	for (int i = 1; i < nTail; i++)
-	{
-		if (tailY[i] == tailY[i - 1] && tailX[i] != tailX[i - 1]) //水平跟随
-			spSnakeBody.setPosition({ static_cast<float>((tailX[i] + (tailX[i - 1] - tailX[i]) * stepLength) * GRIDSIZE + detaX), static_cast<float>(tailY[i] * GRIDSIZE + detaY) });
-		if (tailY[i] != tailY[i - 1] && tailX[i] == tailX[i - 1]) //竖直跟随
-			spSnakeBody.setPosition({ static_cast<float>(tailX[i] * GRIDSIZE + detaX), static_cast<float>((tailY[i] + (tailY[i - 1] - tailY[i]) * stepLength) * GRIDSIZE + detaY) });
-		if (tailY[i] != tailY[i - 1] && tailX[i] != tailX[i - 1]) //拐角跟随
-			spSnakeBody.setPosition({ static_cast<float>((tailX[i] + (tailX[i - 1] - tailX[i]) * stepLength) * GRIDSIZE + detaX), static_cast<float>((tailY[i] + (tailY[i - 1] - tailY[i]) * stepLength) * GRIDSIZE + detaY) });
-		window.draw(spSnakeBody);
-	}
 	// for (int i = 1; i < nTail; i++)
 	// {
-	// 	if (tailY[i] == tailY[i - 1] && tailX[i] != tailX[i - 1])	//水平跟随
-	// 	{
-	// 		if (abs(tailX[i - 1] - tailX[i]) == 1)//解决蛇身秒闪过去的动画
-	// 		{
-	// 			spSnakeBody.setPosition({ static_cast<float>((tailX[i] + (tailX[i - 1] - tailX[i]) * stepLength) * GRIDSIZE + detaX - 2), static_cast<float>(tailY[i] * GRIDSIZE + detaY - 1) });
-	// 		}
-	// 	}
-	// 	if (tailY[i] != tailY[i - 1] && tailX[i] == tailX[i - 1])	//竖直跟随
-	// 	{
-	// 		if (abs(tailY[i - 1] - tailY[i]) == 1)//解决蛇身秒闪过去的动画
-	// 		{
-	// 			spSnakeBody.setPosition({ static_cast<float>(tailX[i] * GRIDSIZE + detaX - 2), static_cast<float>((tailY[i] + (tailY[i - 1] - tailY[i]) * stepLength) * GRIDSIZE + detaY - 1 )});
-	// 		}
-	// 	}
+	// 	if (tailY[i] == tailY[i - 1] && tailX[i] != tailX[i - 1]) //水平跟随
+	// 		spSnakeBody.setPosition({ static_cast<float>((tailX[i] + (tailX[i - 1] - tailX[i]) * stepLength) * GRIDSIZE + detaX), static_cast<float>(tailY[i] * GRIDSIZE + detaY) });
+	// 	if (tailY[i] != tailY[i - 1] && tailX[i] == tailX[i - 1]) //竖直跟随
+	// 		spSnakeBody.setPosition({ static_cast<float>(tailX[i] * GRIDSIZE + detaX), static_cast<float>((tailY[i] + (tailY[i - 1] - tailY[i]) * stepLength) * GRIDSIZE + detaY) });
+	// 	if (tailY[i] != tailY[i - 1] && tailX[i] != tailX[i - 1]) //拐角跟随
+	// 		spSnakeBody.setPosition({ static_cast<float>((tailX[i] + (tailX[i - 1] - tailX[i]) * stepLength) * GRIDSIZE + detaX), static_cast<float>((tailY[i] + (tailY[i - 1] - tailY[i]) * stepLength) * GRIDSIZE + detaY) });
 	// 	window.draw(spSnakeBody);
 	// }
+	for (int i = 1; i < nTail; i++)
+	{
+		if (tailY[i] == tailY[i - 1] && tailX[i] != tailX[i - 1])	//水平跟随
+		{
+			if (abs(tailX[i - 1] - tailX[i]) == 1)//解决蛇身秒闪过去的动画，当前后蛇身节点不相邻时不绘制蛇身
+			{
+				spSnakeBody.setPosition({ static_cast<float>((tailX[i] + (tailX[i - 1] - tailX[i]) * stepLength) * GRIDSIZE + detaX), static_cast<float>(tailY[i] * GRIDSIZE + detaY) });
+			}
+		}
+		if (tailY[i] != tailY[i - 1] && tailX[i] == tailX[i - 1])	//竖直跟随
+		{
+			if (abs(tailY[i - 1] - tailY[i]) == 1)//解决蛇身秒闪过去的动画
+			{
+				spSnakeBody.setPosition({ static_cast<float>(tailX[i] * GRIDSIZE + detaX), static_cast<float>((tailY[i] + (tailY[i - 1] - tailY[i]) * stepLength) * GRIDSIZE + detaY) });
+			}
+		}
+		if (tailY[i] != tailY[i - 1] && tailX[i] != tailX[i - 1]) //拐角跟随
+		{
+			if (abs(tailY[i - 1] - tailY[i]) == 1 && abs(tailX[i - 1] - tailX[i]) == 1)//解决蛇身秒闪过去的动画
+			{
+				spSnakeBody.setPosition({ static_cast<float>((tailX[i] + (tailX[i - 1] - tailX[i]) * stepLength) * GRIDSIZE + detaX), static_cast<float>((tailY[i] + (tailY[i - 1] - tailY[i]) * stepLength) * GRIDSIZE + detaY) });
+			}
+		}
+		window.draw(spSnakeBody);
+	}
 
 	//绘制水果
 	spFruit.setPosition({ static_cast<float>(fruitX * GRIDSIZE + detaX),static_cast<float> (fruitY * GRIDSIZE + detaY) });
@@ -581,7 +593,7 @@ int main()
 				DrawStep();
 				break;
 			}
-			
+
 		}
 		while (gameOver)
 		{

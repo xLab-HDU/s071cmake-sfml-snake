@@ -7,18 +7,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build SFML libraries as shared" OFF)
 
 # 查找本地安装的 SFML 开发包
-set(SFML_STATIC_LIBRARIES TRUE) # 配合上面的 BUILD_SHARED_LIBS OFF 可实现静态链接
-find_package(SFML COMPONENTS Graphics Window System Audio Network REQUIRED)
+# set(SFML_STATIC_LIBRARIES TRUE) # 配合上面的 BUILD_SHARED_LIBS OFF 可实现静态链接
+# find_package(SFML COMPONENTS Graphics Window System Audio Network REQUIRED)
 
 # 获取SFML源码并构建
-# include(FetchContent)
-# FetchContent_Declare(SFML
-#     GIT_REPOSITORY https://github.com/SFML/SFML.git
-#     GIT_TAG 3.0.1
-#     GIT_SHALLOW ON
-#     EXCLUDE_FROM_ALL
-#     SYSTEM)
-# FetchContent_MakeAvailable(SFML)
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 3.0.1
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM)
+FetchContent_MakeAvailable(SFML)
 
 add_executable(main src/main.cpp)
 target_compile_features(main PRIVATE cxx_std_17)
