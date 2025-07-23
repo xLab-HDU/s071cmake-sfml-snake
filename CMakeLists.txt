@@ -25,10 +25,10 @@ target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
 
 # 将 libstdc++ 和 libgcc 编译进可执行文件中，避免运行时依赖外部 DLL
-target_link_libraries(main PRIVATE
-    -static-libgcc
-    -static-libstdc++
-)
+# target_link_libraries(main PRIVATE
+#     -static-libgcc
+#     -static-libstdc++
+# )
 
 # 测试 & 打包
 enable_testing()
