@@ -23,8 +23,8 @@ FetchContent_MakeAvailable(SFML)
 add_executable(main src/main.cpp)
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
-
-# 将 libstdc++ 和 libgcc 编译进可执行文件中，避免运行时依赖外部 DLL
+       
+# 针对MinGW，需要将 libstdc++ 和 libgcc 编译进可执行文件中，避免运行时依赖外部 DLL
 # target_link_libraries(main PRIVATE
 #     -static-libgcc
 #     -static-libstdc++
@@ -40,9 +40,9 @@ install(DIRECTORY "data/"
         FILES_MATCHING PATTERN "*"
 )
 
-set(CPACK_PACKAGE_NAME "CMakeSFMLProject")
+set(CPACK_PACKAGE_NAME "Snake")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_VENDOR "HDU")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CMake-SFML-Project")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CMake-SFML-Snake")
 set(CPACK_PACKAGE_CONTACT "contact@example.com")
 include(CPack)
