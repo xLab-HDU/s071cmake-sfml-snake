@@ -1,7 +1,7 @@
 # CMake SFML Snake
 This repository is a snake game implemented in C++ using SFML, built with CMake. 
 
-[![Build Status](https://github.com/xLab-HDU/sfml-cmake-snake/actions/workflows/ci.yml/badge.svg)](https://github.com/xLab-HDU/sfml-cmake-snake/actions)
+[![Build Status](https://github.com/xLab-HDU/cmake-sfml-snake/actions/workflows/ci.yml/badge.svg)](https://github.com/xLab-HDU/cmake-sfml-snake/actions)
 
 ## How to Use
 
