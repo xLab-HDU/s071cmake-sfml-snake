@@ -2,6 +2,7 @@
 #include <SFML/Audio.hpp>
 #include <iostream>
 #include <sstream>
+#include <time.h>
 #define WINDOW_WIDTH 80		//窗口的宽度
 #define WINDOW_HEIGHT 25	//窗口的高度
 #define STAGE_WIDTH 20		//舞台宽度
@@ -12,16 +13,16 @@
 #define INFO_WIDTH 400
 #define STEP 0.1
 
-using namespace sf;			//SFML中的每个类都位于该命名空间之下，不设定sf命名空间的话，相应的函数前需要用作用域解析符，例如 sf::VideoMode(width* GRIDSIZE, height* GRIDSIZE)
-bool gameOver, gameQuit;
-const int width = STAGE_WIDTH;
-const int height = STAGE_HEIGHT;
-int x, y, fruitX, fruitY, score;
+using namespace sf;			//SFML中的每个类都位于该命名空间之下，不设定sf命名空间的话，相应的函数前需要用作用域解析符，例如 sf::VideoMode(mWidth* GRIDSIZE, mHeight* GRIDSIZE)
+bool isGameOver, isGameQuit;
+const int mWidth = STAGE_WIDTH;
+const int mHeight = STAGE_HEIGHT;
+int headX, headY, fruitX, fruitY, mScore;
 int tailX[MAXLENGTH], tailY[MAXLENGTH];
 int nTail;
-int delay;
+int mDelay;
 int GameMode;
-float stepX, stepY;
+float mStepX, mStepY;
 
 enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
 eDirection dir, dir_ing;
@@ -30,7 +31,7 @@ void gameOver_info(int _x, int _y);
 //这里我们还没有用到类的封装，所以暂时把window作为全局变量。
 //对新建窗口的封装，第一个参数是一个VideoMode，表示窗口大小，第二个表示窗口标题.实际上最多可以使用四个参数，最后两个是可选的 -  Style 和ContextSettings。
 //标题中有宽字符的，字符串前要加L，不然会显示乱码
-sf::RenderWindow window(sf::VideoMode({ width * GRIDSIZE + INFO_WIDTH, height * GRIDSIZE + GRIDSIZE }), L"Snake by 李仕");
+sf::RenderWindow window(sf::VideoMode({ mWidth * GRIDSIZE + INFO_WIDTH, mHeight * GRIDSIZE + GRIDSIZE }), L"Snake by 李仕");
 
 // Texture tBackground("../data/images/BK.png"), tSnakeHead("../data/images/SH01.png"), tSnakeBody("../data/images/SB0102.png"), tFruit("../data/images/sb0202.png");		//创建4个纹理对象
 // Sprite spBackground(tBackground), spSnakeHead(tSnakeHead), spSnakeBody(tSnakeBody), spFruit(tFruit);		//创建4个精灵对象
@@ -38,7 +39,7 @@ sf::RenderWindow window(sf::VideoMode({ width * GRIDSIZE + INFO_WIDTH, height * 
 Texture tBackground, tSnakeHead, tSnakeBody, tFruit;		//创建4个纹理对象
 Sprite spBackground(tBackground), spSnakeHead(tSnakeHead), spSnakeBody(tSnakeBody), spFruit(tFruit);		//创建4个精灵对象
 
-int headRotation;
+int mHeadRotation;
 Font font;
 Text text(font);
 SoundBuffer sbEat, sbDie;
@@ -106,20 +107,21 @@ void Initial()
 	soundVolume = 50;
 	MusicOn = true;
 
-	gameOver = false;
-	gameQuit = false;
+	isGameOver = false;
+	isGameQuit = false;
 	GameMode = 1;
-	stepX = 0.0;
-	stepY = 0.0;
-	headRotation = 0;
-	delay = 0;
+	mStepX = 0.0;
+	mStepY = 0.0;
+	mHeadRotation = 0;
+	mDelay = 0;
 	dir = STOP;
 	dir_ing = STOP;
-	x = width / 2;
-	y = height / 2;
-	fruitX = rand() % width;
-	fruitY = rand() % height;
-	score = 0;
+	headX = mWidth / 2;
+	headY = mHeight / 2;
+	srand((time(nullptr)));	//设置随机种子
+	fruitX = rand() % mWidth;
+	fruitY = rand() % mHeight;
+	mScore = 0;
 
 	nTail = 1;
 	for (int i = 0; i < MAXLENGTH; i++)
@@ -140,17 +142,17 @@ void Input()
 		if (event->is<sf::Event::Closed>())
 		{
 			window.close();		//窗口可以移动、调整大小和最小化。但是如果要关闭，需要自己去调用close()函数
-			gameOver = false;
-			gameQuit = true;
+			isGameOver = false;
+			isGameQuit = true;
 		}
 
 		if (const auto* KeyReleased = event->getIf<sf::Event::KeyReleased>())
 		{
-			if (KeyReleased->scancode == sf::Keyboard::Scancode::X)
+			if (KeyReleased->scancode == sf::Keyboard::Scancode::Escape)
 			{
-				window.close();		//窗口可以移动、调整大小和最小化。但是如果要关闭，需要自己去调用close()函数
-				gameOver = false;
-				gameQuit = true;
+				window.close();		//按Escape调用close()函数退出程序
+				isGameOver = false;
+				isGameQuit = true;
 			}
 			if (KeyReleased->scancode == sf::Keyboard::Scancode::Space)
 			{
@@ -192,7 +194,7 @@ void Input()
 
 	}
 
-
+	// 下方代码可能会涉及到蛇头180度转弯的问题，请结合课后习题自行修改代码
 	if (Keyboard::isKeyPressed(Keyboard::Scancode::Left) || Keyboard::isKeyPressed(Keyboard::Scancode::A))	//按键判定
 		if (dir != RIGHT)
 			dir = LEFT;
@@ -276,7 +278,7 @@ void Prompt_info(int _x, int _y)
 	CharacterSize = 48;
 	text.setCharacterSize(CharacterSize);
 	std::stringstream ss;
-	ss << score;
+	ss << mScore;
 	text.setString(ss.str()); window.draw(text);
 
 	CharacterSize = 24;
@@ -288,48 +290,48 @@ void Prompt_info(int _x, int _y)
 	text.setString(L"■ 作者：杭电数媒 李仕");
 	window.draw(text);
 }
-void Logic()		//上一章的代码，没改
+void Logic()		
 {
 	int prevX = tailX[0];
 	int prevY = tailY[0];
 	int prev2X, prev2Y;
-	tailX[0] = x;
-	tailY[0] = y;
+	tailX[0] = headX;
+	tailY[0] = headY;
 
 	switch (dir)
 	{
 	case LEFT:
-		x--;
-		headRotation = -90;
+		headX--;
+		mHeadRotation = -90;
 		break;
 	case RIGHT:
-		x++;
-		headRotation = 90;
+		headX++;
+		mHeadRotation = 90;
 		break;
 	case UP:
-		y--;
-		headRotation = 0;
+		headY--;
+		mHeadRotation = 0;
 		break;
 	case DOWN:
-		y++;
-		headRotation = 180;
+		headY++;
+		mHeadRotation = 180;
 		break;
 	default:
 		break;
 	}
 
 	// 穿墙
-	if (x >= width) x = 0;	else if (x < 0)	x = width - 1;
-	if (y >= height) y = 0; else if (y < 0) y = height - 1;
+	if (headX >= mWidth) headX = 0;	else if (headX < 0)	headX = mWidth - 1;
+	if (headY >= mHeight) headY = 0; else if (headY < 0) headY = mHeight - 1;
 
-	//if (x > width || x < 0 || y > height || y < 0)
-	//	gameOver = true;
-	if (x == fruitX && y == fruitY)
+	//if (headX > mWidth || headX < 0 || headY > mHeight || headY < 0)
+	//	isGameOver = true;
+	if (headX == fruitX && headY == fruitY)
 	{
-		score += 10;
+		mScore += 10;
 		soundEat.play();//播放吃的音效
-		fruitX = rand() % width;
-		fruitY = rand() % height;
+		fruitX = rand() % mWidth;
+		fruitY = rand() % mHeight;
 		nTail++;
 	}
 	for (int i = 1; i < nTail; i++)
@@ -343,32 +345,32 @@ void Logic()		//上一章的代码，没改
 	}
 
 	for (int i = 1; i < nTail; i++)
-		if (tailX[i] == x && tailY[i] == y)
+		if (tailX[i] == headX && tailY[i] == headY)
 		{
 			soundDie.play();//播放死亡的音效
-			gameOver = true;
+			isGameOver = true;
 		}
 
-	stepX = 0.0;
-	stepY = 0.0;
+	mStepX = 0.0;
+	mStepY = 0.0;
 }
 void Draw()
 {
 	window.clear(Color(255, 0, 255, 255));	//清屏
-	Prompt_info(width * GRIDSIZE + GRIDSIZE, GRIDSIZE);
+	Prompt_info(mWidth * GRIDSIZE + GRIDSIZE, GRIDSIZE);
 
 	int detaX = GRIDSIZE / SCALE / 2;
 	int detaY = GRIDSIZE / SCALE / 2;
 	//绘制背景
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++)
+	for (int i = 0; i < mWidth; i++)
+		for (int j = 0; j < mHeight; j++)
 		{
 			spBackground.setPosition({ static_cast<float>(i * GRIDSIZE + detaX), static_cast<float>(j * GRIDSIZE + detaY) });	//指定纹理的位置
 			window.draw(spBackground);							//将纹理绘制到缓冲区
 		}
 	//绘制蛇
 	spSnakeHead.setPosition({ static_cast<float>(tailX[0] * GRIDSIZE + detaX), static_cast<float>(tailY[0] * GRIDSIZE + detaY) });
-	spSnakeHead.setRotation(sf::degrees(headRotation));
+	spSnakeHead.setRotation(sf::degrees(mHeadRotation));
 	window.draw(spSnakeHead);
 
 	for (int i = 1; i < nTail; i++)
@@ -380,8 +382,8 @@ void Draw()
 	spFruit.setPosition({ static_cast<float>(fruitX * GRIDSIZE + detaX), static_cast<float>(fruitY * GRIDSIZE + detaY) });
 	window.draw(spFruit);
 
-	if (gameOver)
-		gameOver_info(width / 8 * GRIDSIZE, height / 4 * GRIDSIZE);
+	if (isGameOver)
+		gameOver_info(mWidth / 8 * GRIDSIZE, mHeight / 4 * GRIDSIZE);
 	window.display();				//把显示缓冲区的内容，显示在屏幕上。SFML采用的是双缓冲机制
 }
 void LogicStep() //步进细化
@@ -394,50 +396,50 @@ void LogicStep() //步进细化
 	switch (dir_ing)
 	{
 	case LEFT:
-		stepX -= STEP;
-		if (stepX < -0.9999 || stepX >= 0.9999)
+		mStepX -= STEP;
+		if (mStepX < -0.9999 || mStepX >= 0.9999)
 		{
-			x--;
-			stepX = 0;
-			stepY = 0;
+			headX--;
+			mStepX = 0;
+			mStepY = 0;
 			dir_ing = dir;
-			headRotation = -90;
+			mHeadRotation = -90;
 			updateFlag = true;
 		}
 		break;
 	case RIGHT:
-		stepX += STEP;
-		if (stepX < -0.9999 || stepX >= 0.9999)
+		mStepX += STEP;
+		if (mStepX < -0.9999 || mStepX >= 0.9999)
 		{
-			x++;
-			stepX = 0;
-			stepY = 0;
+			headX++;
+			mStepX = 0;
+			mStepY = 0;
 			dir_ing = dir;
-			headRotation = 90;
+			mHeadRotation = 90;
 			updateFlag = true;
 		}
 		break;
 	case UP:
-		stepY -= STEP;
-		if (stepY < -0.9999 || stepY >= 0.9999)
+		mStepY -= STEP;
+		if (mStepY < -0.9999 || mStepY >= 0.9999)
 		{
-			y--;
-			stepX = 0;
-			stepY = 0;
+			headY--;
+			mStepX = 0;
+			mStepY = 0;
 			dir_ing = dir;
-			headRotation = 0;
+			mHeadRotation = 0;
 			updateFlag = true;
 		}
 		break;
 	case DOWN:
-		stepY += STEP;
-		if (stepY < -0.9999 || stepY >= 0.9999)
+		mStepY += STEP;
+		if (mStepY < -0.9999 || mStepY >= 0.9999)
 		{
-			y++;
-			stepX = 0;
-			stepY = 0;
+			headY++;
+			mStepX = 0;
+			mStepY = 0;
 			dir_ing = dir;
-			headRotation = 180;
+			mHeadRotation = 180;
 			updateFlag = true;
 		}
 		break;
@@ -445,21 +447,21 @@ void LogicStep() //步进细化
 		dir_ing = dir;
 		break;
 	}
-	//if (x > width || x < 0 || y > height || y < 0)
-	//	gameOver = true;
+	//if (headX > mWidth || headX < 0 || headY > mHeight || headY < 0)
+	//	isGameOver = true;
 
 	// 穿墙
-	if (x >= width) x = 0;	else if (x < 0)	x = width - 1;
-	if (y >= height) y = 0; else if (y < 0) y = height - 1;
+	if (headX >= mWidth) headX = 0;	else if (headX < 0)	headX = mWidth - 1;
+	if (headY >= mHeight) headY = 0; else if (headY < 0) headY = mHeight - 1;
 
 	if (updateFlag == true)
 	{
-		if (x == fruitX && y == fruitY)
+		if (headX == fruitX && headY == fruitY)
 		{
 			soundEat.play();//播放吃的音效
-			score += 10;
-			fruitX = rand() % width;
-			fruitY = rand() % height;
+			mScore += 10;
+			fruitX = rand() % mWidth;
+			fruitY = rand() % mHeight;
 			nTail++;
 		}
 		for (int i = 1; i < nTail; i++)
@@ -470,42 +472,42 @@ void LogicStep() //步进细化
 			tailY[i] = prevY;
 			prevX = prev2X;
 			prevY = prev2Y;
-			if (tailX[i] >= width) tailX[i] = 0;	else if (tailX[i] < 0)	tailX[i] = width - 1;
-			if (tailY[i] >= height) tailY[i] = 0;  else if (tailY[i] < 0) tailY[i] = height - 1;
+			if (tailX[i] >= mWidth) tailX[i] = 0;	else if (tailX[i] < 0)	tailX[i] = mWidth - 1;
+			if (tailY[i] >= mHeight) tailY[i] = 0;  else if (tailY[i] < 0) tailY[i] = mHeight - 1;
 		}
 
-		tailX[0] = x;
-		tailY[0] = y;
+		tailX[0] = headX;
+		tailY[0] = headY;
 		for (int i = 1; i < nTail; i++)
-			if (tailX[i] == x && tailY[i] == y)
+			if (tailX[i] == headX && tailY[i] == headY)
 			{
 				soundDie.play();//播放死亡的音效
-				gameOver = true;
+				isGameOver = true;
 			}
 	}
 }
 void DrawStep()
 {
 	window.clear(Color(255, 0, 255, 255));	//清屏
-	Prompt_info(width * GRIDSIZE + GRIDSIZE, GRIDSIZE);
+	Prompt_info(mWidth * GRIDSIZE + GRIDSIZE, GRIDSIZE);
 
 	int detaX = GRIDSIZE / SCALE / 2;
 	int detaY = GRIDSIZE / SCALE / 2;
 	//绘制背景
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++)
+	for (int i = 0; i < mWidth; i++)
+		for (int j = 0; j < mHeight; j++)
 		{
 			spBackground.setPosition({ static_cast<float>(i * GRIDSIZE + detaX), static_cast<float>(j * GRIDSIZE + detaY) });	//指定纹理的位置
 			window.draw(spBackground);							//将纹理绘制到缓冲区
 		}
 	//绘制蛇
 	float stepLength;
-	stepLength = stepX + stepY;
+	stepLength = mStepX + mStepY;
 	if (stepLength < 0)
 		stepLength = -stepLength;
 
-	spSnakeHead.setPosition({ static_cast<float>((tailX[0] + stepX) * GRIDSIZE + detaX), static_cast<float>((tailY[0] + stepY) * GRIDSIZE + detaY) });
-	spSnakeHead.setRotation(sf::degrees(headRotation));
+	spSnakeHead.setPosition({ static_cast<float>((tailX[0] + mStepX) * GRIDSIZE + detaX), static_cast<float>((tailY[0] + mStepY) * GRIDSIZE + detaY) });
+	spSnakeHead.setRotation(sf::degrees(mHeadRotation));
 	window.draw(spSnakeHead);
 
 	// for (int i = 1; i < nTail; i++)
@@ -548,8 +550,8 @@ void DrawStep()
 	spFruit.setPosition({ static_cast<float>(fruitX * GRIDSIZE + detaX),static_cast<float> (fruitY * GRIDSIZE + detaY) });
 	window.draw(spFruit);
 
-	if (gameOver)
-		gameOver_info(width / 8 * GRIDSIZE, height / 4 * GRIDSIZE);
+	if (isGameOver)
+		gameOver_info(mWidth / 8 * GRIDSIZE, mHeight / 4 * GRIDSIZE);
 
 	window.display();				//把显示缓冲区的内容，显示在屏幕上。SFML采用的是双缓冲机制
 }
@@ -573,17 +575,17 @@ int main()
 
 		Initial();
 
-		while (window.isOpen() && gameOver == false)
+		while (window.isOpen() && isGameOver == false)
 		{
 			Input();
 
 			switch (GameMode)
 			{
 			case 1:
-				delay++;
-				if (delay % 10 == 0)
+				mDelay++;
+				if (mDelay % 10 == 0)
 				{
-					delay = 0;
+					mDelay = 0;
 					Logic();
 				}
 				Draw();
@@ -595,30 +597,30 @@ int main()
 			}
 
 		}
-		while (gameOver)
+		while (isGameOver)
 		{
 			while (const std::optional event = window.pollEvent()) {
 				if (event->is<sf::Event::Closed>()) {
 					window.close();
-					gameOver = false;
-					gameQuit = true;
+					isGameOver = false;
+					isGameQuit = true;
 				}
 				if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
 					if (keyReleased->scancode == sf::Keyboard::Scancode::Y)
 					{
-						gameOver = false;
+						isGameOver = false;
 					}
 					if (keyReleased->scancode == sf::Keyboard::Scancode::N)
 					{
-						gameOver = false;
-						gameQuit = true;
+						isGameOver = false;
+						isGameQuit = true;
 					}
 				}
 			}
 
 		}
 
-	} while (!gameQuit);
+	} while (!isGameQuit);
 
 	//system("pause");
 	return 0;
