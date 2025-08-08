@@ -3,8 +3,8 @@ project(CMakeSFMLProject LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# 选项：是否将SFML库构建为共享库，动态模式设为 ON；静态模式则设为 OFF
-option(BUILD_SHARED_LIBS "Build SFML libraries as shared" OFF)
+# 选项：是否构建为共享库，共享库设为 ON；静态库设为 OFF
+option(BUILD_SHARED_LIBS "Build libraries as shared" OFF)
 
 # 查找本地安装的 SFML 开发包
 # set(SFML_STATIC_LIBRARIES TRUE) # 配合上面的 BUILD_SHARED_LIBS OFF 可实现静态链接
@@ -24,12 +24,13 @@ add_executable(main src/main.cpp)
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
        
-# 针对MinGW，静态链接时需要将 libstdc++ 和 libgcc 编译进可执行文件中，避免运行时依赖外部 DLL
-if(CMAKE_CXX_COMPILER_ID MATCHES "MinGW")
-    target_link_libraries(main PRIVATE
-        -static-libgcc
-        -static-libstdc++
-    )
+# 在Windows系统中（使用 MinGW-w64）构建时
+# 静态链接需要将libstdc++、libgcc编译进可执行文件中，避免运行时依赖外部 DLL
+if(WIN32 AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")))
+  target_link_libraries(main PRIVATE
+      -static-libgcc
+      -static-libstdc++
+    )  
 endif()
 
 # 测试 & 打包
