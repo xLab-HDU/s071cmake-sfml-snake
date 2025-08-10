@@ -15,6 +15,7 @@
 
 using namespace sf;			//SFML中的每个类都位于该命名空间之下，不设定sf命名空间的话，相应的函数前需要用作用域解析符，例如 sf::VideoMode(mWidth* GRIDSIZE, mHeight* GRIDSIZE)
 bool isGameOver, isGameQuit;
+bool updateFlag;
 const int mWidth = STAGE_WIDTH;
 const int mHeight = STAGE_HEIGHT;
 int headX, headY, fruitX, fruitY, mScore;
@@ -55,7 +56,6 @@ void Initial()
 	{
 		std::cout << "字体没有找到" << std::endl;
 	}
-	text.setFont(font);
 
 	if (!tBackground.loadFromFile("../data/images/BK.png"))//加载纹理图片
 	{
@@ -100,8 +100,6 @@ void Initial()
 	spSnakeBody.setScale({ SCALE, SCALE });
 	spFruit.setScale({ SCALE, SCALE });
 
-	// soundEat.setBuffer(sbEat);//音效读入缓冲
-	// soundDie.setBuffer(sbDie);//音效读入缓冲
 	bkMusic.play();				//背景音播放
 	bkMusic.setLooping(true);		//背景音循环
 	soundVolume = 50;
@@ -109,6 +107,7 @@ void Initial()
 
 	isGameOver = false;
 	isGameQuit = false;
+	updateFlag = false;
 	GameMode = 1;
 	mStepX = 0.0;
 	mStepY = 0.0;
@@ -133,10 +132,8 @@ void Initial()
 
 void Input()
 {
-	// sf::Event event;//event types 包括Window、Keyboard、Mouse、Joystick，4类消息
-	//通过  bool Window :: pollEvent（sf :: Event＆event） 从窗口顺序询问（ polled ）事件。 
-	//如果有一个事件等待处理，该函数将返回true，并且事件变量将填充（filled）事件数据。 
-	//如果不是，则该函数返回false。 同样重要的是要注意，一次可能有多个事件; 因此我们必须确保捕获每个可能的事件。 
+	// 在 SFML 3 中，pollEvent()返回 std::optional<sf::Event>：
+	// 如果队列里有事件就返回 optional 的值，否则返回 std::nullopt
 	while (const std::optional event = window.pollEvent())
 	{
 		if (event->is<sf::Event::Closed>())
@@ -214,7 +211,7 @@ void Prompt_info(int _x, int _y)
 	int CharacterSize = 24;
 	text.setCharacterSize(CharacterSize);
 	text.setFillColor(Color(255, 255, 255, 255));
-	text.setStyle(Text::Bold); // |Text::Underlined
+	text.setStyle(Text::Bold); //Text::Underlined
 
 	text.setPosition({ static_cast<float>(_x + initialX),  static_cast<float>(_y + initialY) });
 	text.setString(L"■ 游戏说明："); window.draw(text);
@@ -290,7 +287,7 @@ void Prompt_info(int _x, int _y)
 	text.setString(L"■ 作者：杭电数媒 李仕");
 	window.draw(text);
 }
-void Logic()		
+void Logic()
 {
 	int prevX = tailX[0];
 	int prevY = tailY[0];
@@ -356,7 +353,7 @@ void Logic()
 }
 void Draw()
 {
-	window.clear(Color(255, 0, 255, 255));	//清屏
+	window.clear(sf::Color(255, 0, 255, 255));	//清屏
 	Prompt_info(mWidth * GRIDSIZE + GRIDSIZE, GRIDSIZE);
 
 	int detaX = GRIDSIZE / SCALE / 2;
@@ -366,13 +363,12 @@ void Draw()
 		for (int j = 0; j < mHeight; j++)
 		{
 			spBackground.setPosition({ static_cast<float>(i * GRIDSIZE + detaX), static_cast<float>(j * GRIDSIZE + detaY) });	//指定纹理的位置
-			window.draw(spBackground);							//将纹理绘制到缓冲区
+			window.draw(spBackground);//将纹理绘制到缓冲区
 		}
 	//绘制蛇
 	spSnakeHead.setPosition({ static_cast<float>(tailX[0] * GRIDSIZE + detaX), static_cast<float>(tailY[0] * GRIDSIZE + detaY) });
 	spSnakeHead.setRotation(sf::degrees(mHeadRotation));
-	window.draw(spSnakeHead);
-
+	window.draw(spSnakeHead);//绘制蛇头
 	for (int i = 1; i < nTail; i++)
 	{
 		spSnakeBody.setPosition({ static_cast<float>(tailX[i] * GRIDSIZE + detaX), static_cast<float>(tailY[i] * GRIDSIZE + detaY) });
@@ -391,7 +387,7 @@ void LogicStep() //步进细化
 	int prevX = tailX[0];
 	int prevY = tailY[0];
 	int prev2X, prev2Y;
-	bool updateFlag = false;
+	updateFlag = false;
 
 	switch (dir_ing)
 	{
