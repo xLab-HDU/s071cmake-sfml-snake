@@ -8,7 +8,7 @@ option(BUILD_SHARED_LIBS "Build libraries as shared" OFF)
 
 # 查找本地安装的 SFML 开发包
 # set(SFML_STATIC_LIBRARIES TRUE) # 配合上面的 BUILD_SHARED_LIBS OFF 可实现静态链接
-# find_package(SFML COMPONENTS Graphics Window System Audio Network REQUIRED)
+# find_package(SFML COMPONENTS Graphics Window System Audio REQUIRED)
 
 # 获取SFML源码并构建
 include(FetchContent)
@@ -20,9 +20,15 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp)
+if (WIN32)
+  add_executable(main WIN32 src/main.cpp)
+  target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Main)
+else()
+  add_executable(main src/main.cpp)
+  target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
+endif()
 target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
+
        
 # 在Windows系统中（使用 MinGW-w64）构建时
 # 静态链接需要将libstdc++、libgcc编译进可执行文件中，避免运行时依赖外部 DLL
@@ -32,6 +38,12 @@ if(WIN32 AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR (CMAKE_CXX_COMPILER_ID STR
       -static-libstdc++
     )  
 endif()
+
+# 使用-mwindows标志隐藏控制台窗口
+# if (WIN32)
+#   # target_link_options(main PRIVATE "-mwindows")
+#   add_executable(main WIN32)
+# endif()
 
 # 测试 & 打包
 enable_testing()
