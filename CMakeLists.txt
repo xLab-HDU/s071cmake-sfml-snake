@@ -45,11 +45,22 @@ endif()
 #   add_executable(main WIN32)
 # endif()
 
+# 自动复制data文件夹到build文件夹目录下
+add_custom_command(TARGET main POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/data # 源路径：项目根目录下的data文件夹
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data  # 目标路径：build所在目录下的data文件夹
+    COMMENT "Copying data directory to output directory"
+)
+
 # 测试 & 打包
 enable_testing()
-add_test(NAME SmokeTest COMMAND main)
+add_test(NAME SmokeTest
+         COMMAND main
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-install(TARGETS main RUNTIME DESTINATION bin)
+
+install(TARGETS main RUNTIME DESTINATION .)
 install(DIRECTORY "data/"
         DESTINATION "data"
         FILES_MATCHING PATTERN "*"

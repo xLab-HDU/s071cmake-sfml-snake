@@ -34,7 +34,7 @@ void gameOver_info(int _x, int _y);
 //标题中有宽字符的，字符串前要加L，不然会显示乱码
 sf::RenderWindow window(sf::VideoMode({ mWidth * GRIDSIZE + INFO_WIDTH, mHeight * GRIDSIZE + GRIDSIZE }), L"Snake by 李仕");
 
-// Texture tBackground("../data/images/BK.png"), tSnakeHead("../data/images/SH01.png"), tSnakeBody("../data/images/SB0102.png"), tFruit("../data/images/sb0202.png");		//创建4个纹理对象
+// Texture tBackground("./data/images/BK.png"), tSnakeHead("./data/images/SH01.png"), tSnakeBody("./data/images/SB0102.png"), tFruit("./data/images/sb0202.png");		//创建4个纹理对象
 // Sprite spBackground(tBackground), spSnakeHead(tSnakeHead), spSnakeBody(tSnakeBody), spFruit(tFruit);		//创建4个精灵对象
 
 Texture tBackground, tSnakeHead, tSnakeBody, tFruit;		//创建4个纹理对象
@@ -52,37 +52,37 @@ void Initial()
 {
 	window.setFramerateLimit(60);	//每秒设置目标帧数
 
-	if (!font.openFromFile("../data/fonts/simsun.ttc"))//选择字体，SFML不能直接访问系统的字体，特殊的字体，需要自己加载
+	if (!font.openFromFile("./data/fonts/simsun.ttc"))//选择字体，SFML不能直接访问系统的字体，特殊的字体，需要自己加载
 	{
 		std::cout << "字体没有找到" << std::endl;
 	}
 
-	if (!tBackground.loadFromFile("../data/images/BK.png"))//加载纹理图片
+	if (!tBackground.loadFromFile("./data/images/BK.png"))//加载纹理图片
 	{
 		std::cout << "BK.png 没有找到" << std::endl;
 	}
-	if (!tSnakeHead.loadFromFile("../data/images/SH01.png"))
+	if (!tSnakeHead.loadFromFile("./data/images/SH01.png"))
 	{
 		std::cout << "SH01.png 没有找到" << std::endl;
 	}
-	if (!tSnakeBody.loadFromFile("../data/images/SB0102.png"))
+	if (!tSnakeBody.loadFromFile("./data/images/SB0102.png"))
 	{
 		std::cout << "SB0102.png 没有找到" << std::endl;
 	}
-	if (!tFruit.loadFromFile("../data/images/sb0202.png"))
+	if (!tFruit.loadFromFile("./data/images/sb0202.png"))
 	{
 		std::cout << "sb0202.png 没有找到" << std::endl;
 	}
 	/////////////////////////
-	if (!sbEat.loadFromFile("../data/Audios/Eat01.ogg"))//加载音频
+	if (!sbEat.loadFromFile("./data/Audios/Eat01.ogg"))//加载音频
 	{
 		std::cout << "Eat01.ogg 没有找到" << std::endl;
 	}
-	if (!sbDie.loadFromFile("../data/Audios/Die01.ogg"))//加载音频
+	if (!sbDie.loadFromFile("./data/Audios/Die01.ogg"))//加载音频
 	{
 		std::cout << "Die01.ogg 没有找到" << std::endl;
 	}
-	if (!bkMusic.openFromFile("../data/Audios/BGM01.ogg"))//加载背景音乐
+	if (!bkMusic.openFromFile("./data/Audios/BGM01.ogg"))//加载背景音乐
 	{
 		std::cout << "BGM01.ogg 没有找到" << std::endl;
 	}
