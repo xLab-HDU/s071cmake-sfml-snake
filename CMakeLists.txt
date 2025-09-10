@@ -20,16 +20,16 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-if (WIN32)
-  add_executable(main WIN32 src/main.cpp)
-  target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Main)
+if(WIN32)
+    # Windows GUI 程序，如果想隐藏控制台窗口
+    add_executable(main WIN32 src/main.cpp)
 else()
-  add_executable(main src/main.cpp)
-  target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
+    # Linux/macOS 或控制台程序
+    add_executable(main src/main.cpp)
 endif()
+target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
 target_compile_features(main PRIVATE cxx_std_17)
 
-       
 # 在Windows系统中（使用 MinGW-w64）构建时
 # 静态链接需要将libstdc++、libgcc编译进可执行文件中，避免运行时依赖外部 DLL
 if(WIN32 AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")))
@@ -45,11 +45,11 @@ endif()
 #   add_executable(main WIN32)
 # endif()
 
-# 自动复制data文件夹到build文件夹目录下
+# 复制data文件夹到可执行文件输出目录
 add_custom_command(TARGET main POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/data # 源路径：项目根目录下的data文件夹
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data  # 目标路径：build所在目录下的data文件夹
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data  # 目标路径：build/bin/所在目录下的data文件夹
     COMMENT "Copying data directory to output directory"
 )
 
